@@ -3,13 +3,13 @@
 
 int N,d2,V;
 
-int construct_6paths();
+void construct_6paths();
 void construct_path_lessthan_3(int Paths[7][N]);
 void construct_path_3(int Paths[7][N]);
 void construct_path_lessthan_d2(int Paths[7][N]);
 void construct_path_d2(int Paths[7][N]);
 void construct_path_largethan_d2(int Paths[7][N]);
-int check_internally_disjoint(int Paths[7][N]);
+void check_internally_disjoint(int Paths[7][N]);
 
 void optimum_connection(int Paths[7][N],int num,int current_location,int i,int dest);
 void three_skip_connection(int Paths[7][N],int num,int current_location,int i,int type,int type2,int type3);
@@ -18,20 +18,11 @@ void trans_Array_used_check(int Paths[7][N],int used_check[N]);
 int one_and_three_skip_connection(int Paths[7][N],int used_check[N],int num,int current_location,int i,int type,int check_num,int dest);
 
 int main(void){
-  int i = 0;
-  for(N = 21;N <= 128;N++){
-    printf("CR(%d,3,d2)は内素である \\\\ \\\\\n",N);
-    for(d2 = 4;d2 < (N + 1) / 2;d2++){
-      for(V = 1;V <= N / 2;V++){
-        i = construct_6paths();
-        if(i == 1) exit(1);
-      }
-    }
-  }
+  for(N = 9;N <= 20;N++) for(d2 = 4;d2 < (N + 1) / 2;d2++) for(V = 1;V <= N / 2;V++) construct_6paths();
 }
 
-int construct_6paths(){
-  int i,j,judge = 0;
+void construct_6paths(){
+  int i,j = 0;
   int P[7][N];
   for(i = 1;i < 7;i++) for(j = 1;j < N;j++) P[i][j] = 0;
   P[1][2] = 1;
@@ -41,18 +32,26 @@ int construct_6paths(){
   P[5][2] = N - 3;
   P[6][2] = N - 1;
 
+  printf("CR(%d,3,%d) 宛先ノード:%d\n",N,d2,V);
   if(V < 3) construct_path_lessthan_3(P);
   else if(V == 3) construct_path_3(P);
   else if(V < d2) construct_path_lessthan_d2(P);
   else if(V == d2) construct_path_d2(P);
   else construct_path_largethan_d2(P);
 
-  judge = check_internally_disjoint(P);
-
-  return judge;
+  for(i = 1;6 >= i;i++){
+    printf("道%d:( 0",i);
+    for(j = 2;N > j;j++){
+      printf(" ");
+      if(P[i][j] == 0 && j != 1) break;
+      printf("%d",P[i][j]);
+    }
+    printf(") 長さ:%d\n",j - 2);
+  }
+  check_internally_disjoint(P);
 }
 
-int check_internally_disjoint(int Paths[7][N]){
+void check_internally_disjoint(int Paths[7][N]){
   int i,j,judge = 0;
   int check[N];
   for(i = 0;i < N;i++) check[i] = 0;
@@ -60,7 +59,8 @@ int check_internally_disjoint(int Paths[7][N]){
   for(i = 1;i < 7;i++) for(j = 1;j < N;j++) if(Paths[i][j] != 0 && Paths[i][j] != V) check[Paths[i][j]]++;
   for(i = 0;i < N;i++) if(check[i] > 1) judge = 1;
 
-  return judge;
+  if(judge == 0) printf("内素である\n\n");
+  else if(judge == 1) printf("内素でない\n\n");
 }
 
 void construct_path_lessthan_3(int Paths[7][N]){
